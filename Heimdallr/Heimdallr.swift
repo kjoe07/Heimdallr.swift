@@ -24,6 +24,7 @@ public let HeimdallrErrorNotAuthorized = 2
         }
     }
 
+    private let bearerToken: String?
     private let accessTokenParser: OAuthAccessTokenParser
     private let httpClient: HeimdallrHTTPClient
 
@@ -60,13 +61,14 @@ public let HeimdallrErrorNotAuthorized = 2
     ///
     /// - returns: A new client initialized with the given token endpoint URL,
     ///     credentials and access token store.
-    @objc public init(tokenURL: URL, credentials: OAuthClientCredentials? = nil, accessTokenStore: OAuthAccessTokenStore = OAuthAccessTokenKeychainStore(), accessTokenParser: OAuthAccessTokenParser = OAuthAccessTokenDefaultParser(), httpClient: HeimdallrHTTPClient = HeimdallrHTTPClientURLSession(), resourceRequestAuthenticator: HeimdallResourceRequestAuthenticator = HeimdallResourceRequestAuthenticatorHTTPAuthorizationHeader()) {
+    @objc public init(tokenURL: URL, credentials: OAuthClientCredentials? = nil, accessTokenStore: OAuthAccessTokenStore = OAuthAccessTokenKeychainStore(), accessTokenParser: OAuthAccessTokenParser = OAuthAccessTokenDefaultParser(), httpClient: HeimdallrHTTPClient = HeimdallrHTTPClientURLSession(), resourceRequestAuthenticator: HeimdallResourceRequestAuthenticator = HeimdallResourceRequestAuthenticatorHTTPAuthorizationHeader(), bearerToken: String? = nil) {
         self.tokenURL = tokenURL
         self.credentials = credentials
         self.accessTokenStore = accessTokenStore
         self.accessTokenParser = accessTokenParser
         self.httpClient = httpClient
         self.resourceRequestAuthenticator = resourceRequestAuthenticator
+        self.bearerToken = bearerToken
     }
 
     /// Invalidates the currently stored access token, if any.
@@ -128,9 +130,9 @@ public let HeimdallrErrorNotAuthorized = 2
 
         var parameters = grant.parameters
         if let credentials = credentials {
-            if let secret = credentials.secret {
-                request.setHTTPAuthorization(.basicAuthentication(username: credentials.id, password: secret))
-            } else {
+            if let bearerToken = bearerToken {
+                request.setHTTPAuthorization(.bearerToken(token: bearerToken))
+            }  else {
                 parameters["client_id"] = credentials.id
             }
         }

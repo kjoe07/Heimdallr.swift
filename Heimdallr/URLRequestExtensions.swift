@@ -13,6 +13,8 @@ public enum HTTPAuthentication: Equatable {
     ///
     /// - parameter _: The access token.
     case accessTokenAuthentication(OAuthAccessToken)
+    
+    case bearerToken(token: String)
 
     /// Returns the authentication encoded as `String` suitable for the HTTP
     /// `Authorization` header.
@@ -28,7 +30,10 @@ public enum HTTPAuthentication: Equatable {
             }
         case let .accessTokenAuthentication(accessToken):
             return "\(accessToken.tokenType) \(accessToken.accessToken)"
+        case .bearerToken(let token):
+            return "Bearer \(token)"
         }
+        
     }
 }
 
