@@ -24,7 +24,7 @@ public let HeimdallrErrorNotAuthorized = 2
         }
     }
 
-    private let bearerToken: String?
+    var bearerToken: String?
     private let accessTokenParser: OAuthAccessTokenParser
     private let httpClient: HeimdallrHTTPClient
 
@@ -111,8 +111,8 @@ public let HeimdallrErrorNotAuthorized = 2
     /// - parameter grantType: The grant type URI of the extension grant
     /// - parameter parameters: The required parameters for the external grant
     /// - parameter completion: A callback to invoke when the request completed.
-    open func requestAccessToken(grantType: String, parameters: [String: String], completion: @escaping (Result<Void, NSError>) -> Void) {
-        requestAccessToken(grant: .extension(grantType, parameters)) { result in
+    open func requestAccessToken(grantType: String, parameters: [String: String],headerParameters: [String: String], completion: @escaping (Result<Void, NSError>) -> Void) {
+        requestAccessToken(grant: .extension(grantType, parameters), headerParameters: headerParameters) { result in
             completion(result.map { _ in return })
         }
     }
@@ -125,7 +125,7 @@ public let HeimdallrErrorNotAuthorized = 2
     ///
     /// - parameter grant: The authorization grant (e.g., refresh).
     /// - parameter completion: A callback to invoke when the request completed.
-    private func requestAccessToken(grant: OAuthAuthorizationGrant, completion: @escaping (Result<OAuthAccessToken, NSError>) -> Void) {
+    private func requestAccessToken(grant: OAuthAuthorizationGrant, headerParameters: [String: String] = [:], completion: @escaping (Result<OAuthAccessToken, NSError>) -> Void) {
         var request = URLRequest(url: tokenURL)
 
         var parameters = grant.parameters
@@ -140,7 +140,13 @@ public let HeimdallrErrorNotAuthorized = 2
         request.httpMethod = "POST"
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
         request.setHTTPBody(parameters: parameters as [String: AnyObject])
-
+        
+        if headerParameters.count > 0 {
+            for header in headerParameters {
+                request.addValue(header.value, forHTTPHeaderField: header.key)
+            }
+        }
+        
         httpClient.sendRequest(request) { data, response, error in
             if let error = error {
                 completion(.failure(error as NSError))
