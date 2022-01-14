@@ -24,7 +24,7 @@ public let HeimdallrErrorNotAuthorized = 2
         }
     }
 
-    var bearerToken: String?
+    public var bearerToken: String?
     private let accessTokenParser: OAuthAccessTokenParser
     private let httpClient: HeimdallrHTTPClient
 
