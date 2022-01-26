@@ -138,7 +138,7 @@ public let HeimdallrErrorNotAuthorized = 2
         }
 
         request.httpMethod = "POST"
-        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setHTTPBody(parameters: parameters as [String: AnyObject])
         
         if headerParameters.count > 0 {
