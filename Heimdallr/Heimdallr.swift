@@ -129,8 +129,9 @@ public let HeimdallrErrorNotAuthorized = 2
         var request = URLRequest(url: tokenURL)
 
         var parameters = grant.parameters
+        print("parameters:", parameters)
         if let credentials = credentials {
-            if parameters["grant_type"] == nil {
+            if parameters["grant_type"] == nil || parameters["grant_type"] != "password"  {
                 if let secret = credentials.secret {
                     request.setHTTPAuthorization(.basicAuthentication(username: credentials.id, password: secret))
                 } else {
@@ -151,10 +152,12 @@ public let HeimdallrErrorNotAuthorized = 2
         request.httpMethod = "POST"
         
         if parameters["grant_type"] != nil {
+            print("params is not nil")
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             let data = try? JSONSerialization.data(withJSONObject: parameters, options: .fragmentsAllowed)
             request.httpBody = data//setHTTPBody(parameters: data)
         }else {
+            print("params is nil")
             request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
             request.setHTTPBody(parameters: parameters as [String: AnyObject])
         }
