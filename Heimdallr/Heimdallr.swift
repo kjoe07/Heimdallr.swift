@@ -11,7 +11,7 @@ public let HeimdallrErrorNotAuthorized = 2
 /// The all-seeing and all-hearing guardian sentry of your application who
 /// stands on the rainbow bridge network to authorize relevant requests.
 @objc open class Heimdallr: NSObject {
-    public let tokenURL: URL
+    public var tokenURL: URL
     private let credentials: OAuthClientCredentials?
 
     private let accessTokenStore: OAuthAccessTokenStore
@@ -130,11 +130,22 @@ public let HeimdallrErrorNotAuthorized = 2
 
         var parameters = grant.parameters
         if let credentials = credentials {
-            if let bearerToken = bearerToken {
-                request.setHTTPAuthorization(.bearerToken(token: bearerToken))
-            }  else {
-                parameters["client_id"] = credentials.id
+            if parameters["grant_type"] == nil {
+                if let secret = credentials.secret {
+                    request.setHTTPAuthorization(.basicAuthentication(username: credentials.id, password: secret))
+                } else {
+                    parameters["client_id"] = credentials.id
+                }
+            }else {
+                if let bearerToken = bearerToken {
+                    request.setHTTPAuthorization(.bearerToken(token: bearerToken))
+                    
+                }  else {
+                    parameters["client_id"] = credentials.id
+                }
             }
+            
+           
         }
 
         request.httpMethod = "POST"
