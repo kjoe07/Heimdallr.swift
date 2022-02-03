@@ -138,10 +138,15 @@ public let HeimdallrErrorNotAuthorized = 2
         }
 
         request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        let data = try? JSONSerialization.data(withJSONObject: parameters, options: .fragmentsAllowed)
-        request.httpBody = data//setHTTPBody(parameters: data)
         
+        if parameters["grant_type"] != nil {
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            let data = try? JSONSerialization.data(withJSONObject: parameters, options: .fragmentsAllowed)
+            request.httpBody = data//setHTTPBody(parameters: data)
+        }else {
+            request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+            request.setHTTPBody(parameters: parameters as [String: AnyObject])
+        }
         if headerParameters.count > 0 {
             for header in headerParameters {
                 request.addValue(header.value, forHTTPHeaderField: header.key)
